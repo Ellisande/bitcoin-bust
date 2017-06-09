@@ -7,7 +7,7 @@ import PriceChart from './PriceChart';
 const buyReducer = (state, action) => {
   const newState = Object.assign({}, state);
   const buyPrice = newState.exchange.price;
-  const amountPurchased = newState.exchange.totalCoins - action.amount >= 0 ? action.amount : newState.exchange.totalCoins;
+  const amountPurchased = action.amount / newState.exchange.price;
   const newPrice = newState.exchange.price * 1 + (amountPurchased / 10000) * newState.exchange.buysPerSecond;
   const newTotalCoins = newState.exchange.totalCoins - amountPurchased;
   const newBps = newState.exchange.buysPerSecond + 1;
@@ -18,6 +18,12 @@ const buyReducer = (state, action) => {
     sellsPerSecond: newState.exchange.sellsPerSecond,
     history: [...newState.exchange.history, { price: newPrice, time: new Date() }],
   };
+  newState.users = Object.assign({}, newState.users, {
+    [action.user]: {
+      btc: newState.users[action.user].btc + amountPurchased,
+      usd: newState.users[action.user].usd - action.amount,
+    }
+  });
   return newState;
 }
 
@@ -72,14 +78,14 @@ const combinedReducer = (state = {
   if(action.type === 'ADD'){
     newState.users = Object.assign({}, newState.users, {[action.userName]: {btc: 0, usd: 2000}});
   }
-  if(action.type === 'BUY'){
-    newState.users = Object.assign({}, newState.users, {
-      [action.user]: {
-        btc: newState.users[action.user].btc + action.amount,
-        usd: newState.users[action.user].usd - (action.amount * newState.exchange.price),
-      }
-    })
-  }
+  // if(action.type === 'BUY'){
+  //   newState.users = Object.assign({}, newState.users, {
+  //     [action.user]: {
+  //       btc: newState.users[action.user].btc + (action.amount / newState.history.slice(-2)[0]),
+  //       usd: newState.users[action.user].usd - action.amount,
+  //     }
+  //   })
+  // }
   if(action.type === 'SELL'){
     newState.users = Object.assign({}, newState.users, {
       [action.user]: {

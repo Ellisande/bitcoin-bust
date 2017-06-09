@@ -46,7 +46,7 @@ describe('buy', () => {
   });
   it('should not charge me for bitcoin I could not afford', () => {
     const testState = _.merge({}, beginningState, { exchange: { price: 3 } });
-    const buyAmount = 100;
+    const buyAmount = 10;
     const action = buy(buyAmount);
     const newState = buyReducer(testState, action);
     const me = newState.users.justin;
