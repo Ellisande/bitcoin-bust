@@ -93,7 +93,7 @@ const combinedReducer = (state = {
 
 
 
-const store = createStore(combinedReducer, undefined, window && window.devToolsExtension());
+const store = createStore(combinedReducer, undefined, window && window.devToolsExtension && window.devToolsExtension());
 
 const buy = (amount, user) => ({
   type: 'BUY',
@@ -235,4 +235,6 @@ export default App;
 export {
   buyReducer,
   sellReducer,
+  buy,
+  sell,
 }
