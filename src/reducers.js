@@ -1,4 +1,4 @@
-const coinsInCirculation = 10000;
+const coinsInCirculation = 100000;
 
 const buyReducer = (state, action) => {
   const newState = Object.assign({}, state);
@@ -10,7 +10,7 @@ const buyReducer = (state, action) => {
   const totalCost = amountPurchased * newState.exchange.price;
   const purchaseAsFractionOfTotal = (newState.exchange.totalCoins - amountPurchased) / coinsInCirculation;
   const { buysPerSecond } = newState.exchange;
-  const velocity = (buysPerSecond - 10 > 0 ? buysPerSecond - 10 * 0.1 : 0.1);
+  const velocity = Math.log10(buysPerSecond) - 10 > 1 ? Math.log10(buysPerSecond) - 10 > 1 : 0.1;
   const newPrice = newState.exchange.price + velocity;
   const newTotalCoins = newState.exchange.totalCoins - amountPurchased;
   const newBps = newState.exchange.buysPerSecond + 1;
@@ -32,10 +32,12 @@ const buyReducer = (state, action) => {
 
 const sellReducer = (state, action) => {
   const newState = Object.assign({}, state);
+  const { sellsPerSecond } = state.exchange;
   const userBtc = newState.users[action.user].btc;
   const amountToSell = action.amount > userBtc ? userBtc : action.amount;
   const sellPrice = newState.exchange.price;
-  const wantedNewPrice = newState.exchange.price * 0.7;
+  const velocity = Math.log10(sellsPerSecond) - 10 > 1 ? Math.log10(sellsPerSecond) - 10 > 1 : 0.1;
+  const wantedNewPrice = newState.exchange.price - velocity;
   const newPrice = wantedNewPrice > 0 ? wantedNewPrice : 0.1;
   const newTotalCoins = newState.exchange.totalCoins + amountToSell;
   const newSps = newState.exchange.sellsPerSecond + 1;

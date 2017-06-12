@@ -14,7 +14,7 @@ class Robot extends Component {
     const { btc, usd } = this.props.users.robot;
     const randomMove = Math.random() >= 0.5 ? buy.bind(undefined, Math.floor(Math.random() * usd)) : sell.bind(undefined, Math.floor(Math.random() * btc));
     this.props.dispatch(randomMove('robot'));
-    setTimeout(this.makeTrade.bind(this), 1000)
+    setTimeout(this.makeTrade.bind(this), 300)
   }
   render() {
     return (

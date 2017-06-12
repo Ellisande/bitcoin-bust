@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Provider, connect } from 'react-redux';
 import { createStore, combineReducers } from 'redux';
+import numbro from 'numbro';
 import './App.css';
 import { buy, sell, heatup, cooldown } from './actions';
 import { combinedReducer } from './reducers';
@@ -20,15 +21,30 @@ class ShowExchangePure extends Component {
     const [last = 0, current = 0] = this.props.history.slice(-2);
     const direction = last.price - current.price > 0 ? 'down' : 'up';
     const data = this.props.history.map((price, index) => ({y: price.price, x: price.time}));
+    const buyOption = Math.floor(this.props.usd * 0.1 / this.props.price);
+    const sellOption = numbro(Math.floor(this.props.btc * 0.1) * this.props.price).format('0,0.00');
     return (
-      <div>
-        <div>BTC Rate {this.props.price.toFixed(2)}</div>
-        <div className="tiny">Available Coins {this.props.totalCoins.toFixed(2)}</div>
-        <button onClick={() => this.props.buy(this.props.usd * 0.1)}>Buy</button>
-        <button onClick={() => this.props.sell(Math.floor(this.props.btc * 0.1))}>Sell</button>
-        <div>BTC: {this.props.btc.toFixed(2)}</div>
-        <div>USD: {this.props.usd.toFixed(2)}</div>
-        <div>{direction}</div>
+      <div className="screen">
+        <div className="exchange">
+          <div className={direction}>BTC Rate {this.props.price.toFixed(2)}</div>
+          <div className="tiny">Available Coins {this.props.totalCoins.toFixed(2)}</div>
+        </div>
+        <div className="action">
+          <div className="buy">
+            <button className="trade" onClick={() => this.props.buy(this.props.usd * 0.1)}>Buy</button>
+            <div>+{buyOption} BTC</div>
+            <div>-{Math.floor(this.props.usd * 0.1)} USD</div>
+          </div>
+          <div className="sell">
+            <button className="trade" onClick={() => this.props.sell(Math.floor(this.props.btc * 0.1))}>Sell</button>
+            <div>-{Math.floor(this.props.btc * 0.1)} BTC</div>
+            <div>+{sellOption} USD</div>
+          </div>
+        </div>
+        <div className="player">
+          <div>BTC: {this.props.btc.toFixed(2)}</div>
+          <div>USD: {this.props.usd.toFixed(2)}</div>
+        </div>
         <PriceChart data={data} />
         <Robot />
       </div>
