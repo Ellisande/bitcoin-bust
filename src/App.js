@@ -2,14 +2,21 @@ import React, { Component } from 'react';
 import { Provider, connect } from 'react-redux';
 import { createStore, combineReducers } from 'redux';
 import numbro from 'numbro';
+import ReactFireMixin from 'reactfire';
+import _ from 'lodash';
 import './App.css';
 import { buy, sell, heatup, cooldown } from './actions';
 import { combinedReducer } from './reducers';
 import PriceChart from './PriceChart';
 import { store } from './store';
+import withFirebase from './withFirebase';
 
-// //eslint-disable-next-line
-// var socket = io();
+
+
+
+const TestFireBase = props => <div>asdfa {JSON.stringify(props.exchange)}</div>;
+const WrappedFireBase = withFirebase('exchange')(TestFireBase);
+
 
 class ShowExchangePure extends Component {
   constructor(props){
@@ -26,6 +33,10 @@ class ShowExchangePure extends Component {
     const sellOption = numbro(Math.floor(this.props.btc * 0.1) * this.props.price).format('0,0.00');
     return (
       <div className="screen">
+        <div>
+          TESTING
+          <WrappedFireBase />
+        </div>
         <div className="exchange">
           <div className={direction}>BTC Rate {this.props.price.toFixed(2)}</div>
           <div className="tiny">Available Coins {this.props.totalCoins.toFixed(2)}</div>
