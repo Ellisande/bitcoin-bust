@@ -6,9 +6,10 @@ import './App.css';
 import { buy, sell, heatup, cooldown } from './actions';
 import { combinedReducer } from './reducers';
 import PriceChart from './PriceChart';
-import Robot from './Robot';
+import { store } from './store';
 
-const store = createStore(combinedReducer, undefined, window && window.devToolsExtension && window.devToolsExtension());
+// //eslint-disable-next-line
+// var socket = io();
 
 class ShowExchangePure extends Component {
   constructor(props){
@@ -46,7 +47,6 @@ class ShowExchangePure extends Component {
           <div>USD: {this.props.usd.toFixed(2)}</div>
         </div>
         <PriceChart data={data} />
-        <Robot />
       </div>
     );
   }
