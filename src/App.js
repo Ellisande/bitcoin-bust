@@ -134,6 +134,7 @@ class PureSetName extends Component {
     }
     return (
       <form className="enter-name" onSubmit={onSubmit}>
+        <h2>Welcome to Ƀitcoin Ƀust!</h2>
         <label>Enter Your Name:</label>
         <input autoFocus pattern="[a-zA-Z_ ]+" onChange={e => this.setState({userName: e.target.value.replace(/ /g, '_')})}/>
       </form>
