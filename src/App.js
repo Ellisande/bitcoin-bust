@@ -24,7 +24,7 @@ const DisplayExchange = withData('exchange')(({exchange}) => {
 });
 
 const PureBuyButton = props => {
-  const amountToSpend = _.min([Math.floor(props.usd / props.price) * props.price, 100 * props.price]);
+  const amountToSpend = _.min([Math.floor((props.usd * 0.5) / props.price) * props.price, 100 * props.price]);
   const buyAction = (usdToSpend) => {
     if(usdToSpend <= 0 || usdToSpend >= props.usd || usdToSpend / props.price < 1){
       return;
@@ -53,7 +53,7 @@ const BuyButton = _.flow(
 
 
 const PureSellButton = props => {
-  const amountToSell = _.min([props.btc, 100])
+  const amountToSell = _.min([Math.floor(props.btc * 0.5), 100])
   const sellAction = (btcToSell) => {
     if(btcToSell <= 0 || btcToSell > props.btc){
       return;
