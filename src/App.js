@@ -22,8 +22,7 @@ const DisplayExchange = withData('exchange')(({exchange}) => {
 });
 
 const PureBuyButton = props => {
-  const buyOption = Math.floor(props.usd * 0.1 / props.price);
-  const amountToBuy = _.min([props.usd * 0.1, 100 * props.price]);
+  const amountToSpend = _.min([Math.floor(props.usd / props.price) * props.price, 100 * props.price]);
   const buyAction = (usdToSpend) => {
     if(usdToSpend <= 0 || usdToSpend >= props.usd || usdToSpend / props.price < 1){
       return;
@@ -34,9 +33,9 @@ const PureBuyButton = props => {
   };
   return (
     <div className="buy">
-      <button className="trade" onClick={() => buyAction(props.usd * 0.1)}>Buy</button>
-      <div>{numbro(amountToBuy / props.price).format('+0,0')} BTC</div>
-      <div>{numbro(amountToBuy).format('-$0,0.00')} USD</div>
+      <button className="trade" onClick={() => buyAction(amountToSpend)}>Buy</button>
+      <div>{numbro(amountToSpend / props.price).format('+0,0')} BTC</div>
+      <div>{numbro(amountToSpend).format('-$0,0.00')} USD</div>
     </div>
   )
 }
@@ -52,14 +51,7 @@ const BuyButton = _.flow(
 
 
 const PureSellButton = props => {
-  const sellOption = numbro((Math.floor(props.btc * 0.1) || 1) * props.price).format('$0,0.00');
-  const amountToSell = function(){
-    const tenPercent = Math.floor(props.btc * 0.1);
-    if(props.btc === 0) return 0;
-    if(tenPercent >= 1 && tenPercent < 100) return tenPercent;
-    if(tenPercent < 1 && props.btc > 1) return 1;
-    return 100;
-  }();
+  const amountToSell = _.min([props.btc, 100])
   const sellAction = (btcToSell) => {
     if(btcToSell <= 0 || btcToSell > props.btc){
       return;
@@ -70,7 +62,7 @@ const PureSellButton = props => {
   };
   return (
     <div className="sell">
-      <button className="trade" onClick={() => sellAction(Math.floor(props.btc * 0.1) || 1)}>Sell</button>
+      <button className="trade" onClick={() => sellAction(amountToSell)}>Sell</button>
       <div>{numbro(amountToSell).format('-0,0')} BTC</div>
       <div>{numbro(amountToSell * props.price).format('+$0,0.00')} USD</div>
     </div>
