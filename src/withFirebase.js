@@ -177,12 +177,7 @@ const withHistoryHoc = propName => WrappedComponent => {
       };
     }
     componentWillMount(){
-      // this.state.ref.once('value').then( snap => {
-      //   console.log('One time', snap.val());
-      //   this.setState({history: snap.val() });
-      // });
       this.state.ref.limitToLast(100).on('child_added', snap => {
-        console.log('Lots of times', snap.val());
         this.setState( oldState => ({history: [...oldState.history, snap.val()]}));
       })
     }

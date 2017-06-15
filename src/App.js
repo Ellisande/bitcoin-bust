@@ -15,8 +15,7 @@ const DisplayExchange = withData('exchange')(({exchange}) => {
   const totalCoins = exchange.totalCoins || 0;
   return (
     <div className="exchange">
-      <div className="">BTC Rate {price.toFixed(2)}</div>
-      <div className="tiny">Available Coins {totalCoins.toFixed(2)}</div>
+      <div className="">1 BTC = {numbro(price).format('$0,0.00')}</div>
     </div>
   );
 });
@@ -80,6 +79,7 @@ const SellButton = _.flow(
 
 const PurePlayer = props =>
   <div className="player">
+    <div>{props.user}'s Wallet</div>
     <div>BTC: {numbro(props.btc).format('0,0')}</div>
     <div>USD: {numbro(props.usd).format('$0,0.00')}</div>
   </div>;
@@ -90,7 +90,7 @@ const Player = _.flow(
 )(PurePlayer);
 
 
-class ShowExchangePure extends Component {
+class PlayArea extends Component {
   constructor(props){
     super(props);
     this.state = {
@@ -101,45 +101,16 @@ class ShowExchangePure extends Component {
     return (
       <div className="screen">
         <DisplayExchange />
+        <PriceChart />
+        <Player user={this.props.user} />
         <div className="action">
           <BuyButton user={this.props.user} />
           <SellButton user={this.props.user} />
         </div>
-        <Player user={this.props.user} />
-        <PriceChart />
       </div>
     );
   }
 }
-
-const mapDispatchToProps = (dispatch, props) => ({
-  buy: (amount) => {
-      if(props.usd > amount * props.price || amount > props.totalCoins || amount < 1){
-        return;
-      }
-      dispatch(buy(amount, 'justin'));
-      setTimeout(() => dispatch(cooldown()), 3000);
-  },
-  sell: (amount) => {
-    if(amount > props.btc) {
-      return;
-    }
-    dispatch(sell(amount, 'justin'));
-    setTimeout(() => dispatch(heatup()), 3000);
-  }
-})
-
-const ShowExchange = connect(i => ({
-  price: i.exchange.price,
-  totalCoins: i.exchange.totalCoins,
-  sellsPerSecond: i.exchange.sellsPerSecond,
-  buysPerSecond: i.exchange.buysPerSecond,
-  history: i.exchange.history,
-  btc: i.users.justin.btc,
-  usd: i.users.justin.usd,
-}), mapDispatchToProps)(ShowExchangePure);
-
-// const exchange = new Exchange();
 
 const user = {
   btc: 0,
@@ -159,9 +130,9 @@ class PureSetName extends Component {
       this.props.setName(this.state.userName);
     }
     return (
-      <form onSubmit={onSubmit}>
+      <form className="enter-name" onSubmit={onSubmit}>
         <label>Enter Your Name:</label>
-        <input onChange={e => this.setState({userName: e.target.value})}/>
+        <input autoFocus pattern="[a-zA-Z_ ]+" onChange={e => this.setState({userName: e.target.value.replace(/ /g, '_')})}/>
       </form>
     );
   }
@@ -184,7 +155,7 @@ class App extends Component {
     return (
       <Provider store={store}>
         <div className="App">
-          <ShowExchange user={this.state.user} />
+          <PlayArea user={this.state.user} />
         </div>
       </Provider>
     );
