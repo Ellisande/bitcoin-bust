@@ -102,6 +102,26 @@ const withUpdateUserDataHoc = (path, propName) => WrappedComponent => {
   return withUpdateUserData;
 }
 
+const withAddUserHoc = WrappedComponent => {
+  class withAddUser extends Component {
+    render(){
+      const addUser = user => {
+        firebase.database().ref(`users/${user}`).transaction( existingUser => {
+          if(existingUser){
+            return existingUser;
+          }
+          return {
+            usd: 100,
+            btc: 5,
+          };
+        });
+      }
+      return (<WrappedComponent {...this.props} addUser={addUser} />);
+    }
+  }
+  return withAddUser;
+}
+
 const withIncreasePriceHoc = WrappedComponent => {
   const withIncreasePrice = props => {
     const updatePrice = () => {
@@ -129,7 +149,7 @@ const withDecreasePriceHoc = WrappedComponent => {
   const withDecreasePrice = props => {
     const updatePrice = () => {
       const velocity = Math.log10(props.sellsPerSecond);
-      props.updatePrice( oldPrice => oldPrice <= velocity ? 0.001 : oldPrice - velocity );
+      props.updatePrice( oldPrice => oldPrice - velocity < 1 ? 1 : oldPrice - velocity );
       props.updateHistory( props.price );
       props.updateSellsPerSecond( sellsPerSecond => sellsPerSecond + 1);
       setTimeout( () => props.updateSellsPerSecond( sps => sps -1), 1000);
@@ -145,6 +165,36 @@ const withDecreasePriceHoc = WrappedComponent => {
     withDataUpdateHoc('exchange/sellsPerSecond', 'updateSellsPerSecond'),
     withHistoryUpdateHoc,
   )(withDecreasePrice);
+}
+
+const withHistoryHoc = propName => WrappedComponent => {
+  class withHistory extends Component {
+    constructor(props){
+      super(props);
+      this.state = {
+        history: [],
+        ref: firebase.database().ref('exchange/history')
+      };
+    }
+    componentWillMount(){
+      // this.state.ref.once('value').then( snap => {
+      //   console.log('One time', snap.val());
+      //   this.setState({history: snap.val() });
+      // });
+      this.state.ref.limitToLast(100).on('child_added', snap => {
+        console.log('Lots of times', snap.val());
+        this.setState( oldState => ({history: [...oldState.history, snap.val()]}));
+      })
+    }
+    render(){
+      const firebaseProps = {[propName || 'history']: this.state.history};
+      return (<WrappedComponent {...this.props} {...firebaseProps}/>);
+    }
+    componentWillUnmount(){
+      this.state.ref.off();
+    }
+  }
+  return withHistory;
 }
 
 const withHistoryUpdateHoc = WrappedComponent => {
@@ -175,4 +225,6 @@ export {
   withIncreasePriceHoc as withIncreasePrice,
   withDecreasePriceHoc as withDecreasePrice,
   withHistoryUpdateHoc as withHistoryUpdate,
+  withAddUserHoc as withAddUser,
+  withHistoryHoc as withHistory,
 };

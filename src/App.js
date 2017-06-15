@@ -8,7 +8,7 @@ import { buy, sell, heatup, cooldown } from './actions';
 import { combinedReducer } from './reducers';
 import PriceChart from './PriceChart';
 import { store } from './store';
-import { withData, withDataUpdate, withIncreasePrice, withDecreasePrice, withUserData, withUpdateUserData } from './withFirebase';
+import { withData, withDataUpdate, withIncreasePrice, withDecreasePrice, withUserData, withUpdateUserData, withAddUser, withHistory } from './withFirebase';
 
 const DisplayExchange = withData('exchange')(({exchange}) => {
   const price = exchange.price || 1;
@@ -23,6 +23,7 @@ const DisplayExchange = withData('exchange')(({exchange}) => {
 
 const PureBuyButton = props => {
   const buyOption = Math.floor(props.usd * 0.1 / props.price);
+  const amountToBuy = _.min([props.usd * 0.1, 100 * props.price]);
   const buyAction = (usdToSpend) => {
     if(usdToSpend <= 0 || usdToSpend >= props.usd || usdToSpend / props.price < 1){
       return;
@@ -34,8 +35,8 @@ const PureBuyButton = props => {
   return (
     <div className="buy">
       <button className="trade" onClick={() => buyAction(props.usd * 0.1)}>Buy</button>
-      <div>+{buyOption} BTC</div>
-      <div>-{Math.floor(props.usd * 0.1)} USD</div>
+      <div>{numbro(amountToBuy / props.price).format('+0,0')} BTC</div>
+      <div>{numbro(amountToBuy).format('-$0,0.00')} USD</div>
     </div>
   )
 }
@@ -51,12 +52,18 @@ const BuyButton = _.flow(
 
 
 const PureSellButton = props => {
-  const sellOption = numbro((Math.floor(props.btc * 0.1) || 1) * props.price).format('0,0.00');
+  const sellOption = numbro((Math.floor(props.btc * 0.1) || 1) * props.price).format('$0,0.00');
+  const amountToSell = function(){
+    const tenPercent = Math.floor(props.btc * 0.1);
+    if(props.btc === 0) return 0;
+    if(tenPercent >= 1 && tenPercent < 100) return tenPercent;
+    if(tenPercent < 1 && props.btc > 1) return 1;
+    return 100;
+  }();
   const sellAction = (btcToSell) => {
     if(btcToSell <= 0 || btcToSell > props.btc){
       return;
     }
-    console.log('I got called', btcToSell);
     props.updateUsd( oldUsd => oldUsd + (btcToSell * props.price));
     props.updateBtc( oldBtc => oldBtc - btcToSell);
     props.decreasePrice();
@@ -64,8 +71,8 @@ const PureSellButton = props => {
   return (
     <div className="sell">
       <button className="trade" onClick={() => sellAction(Math.floor(props.btc * 0.1) || 1)}>Sell</button>
-      <div>-{Math.floor(props.btc * 0.1)} BTC</div>
-      <div>+{sellOption} USD</div>
+      <div>{numbro(amountToSell).format('-0,0')} BTC</div>
+      <div>{numbro(amountToSell * props.price).format('+$0,0.00')} USD</div>
     </div>
   )
 };
@@ -81,11 +88,14 @@ const SellButton = _.flow(
 
 const PurePlayer = props =>
   <div className="player">
-    <div>BTC: {props.data && props.data.btc && props.data.btc.toFixed(2)}</div>
-    <div>USD: {props.data && props.data.usd &&props.data.usd.toFixed(2)}</div>
+    <div>BTC: {numbro(props.btc).format('0,0')}</div>
+    <div>USD: {numbro(props.usd).format('$0,0.00')}</div>
   </div>;
 
-const Player = withData('users/justin', 'data')(PurePlayer);
+const Player = _.flow(
+  withUserData('btc', 'btc'),
+  withUserData('usd', 'usd'),
+)(PurePlayer);
 
 
 class ShowExchangePure extends Component {
@@ -96,11 +106,6 @@ class ShowExchangePure extends Component {
     }
   }
   render() {
-    const [last = 0, current = 0] = this.props.history.slice(-2);
-    const direction = last.price - current.price > 0 ? 'down' : 'up';
-    const data = this.props.history.map((price, index) => ({y: price.price, x: price.time}));
-    const buyOption = Math.floor(this.props.usd * 0.1 / this.props.price);
-    const sellOption = numbro(Math.floor(this.props.btc * 0.1) * this.props.price).format('0,0.00');
     return (
       <div className="screen">
         <DisplayExchange />
@@ -108,8 +113,8 @@ class ShowExchangePure extends Component {
           <BuyButton user={this.props.user} />
           <SellButton user={this.props.user} />
         </div>
-        <Player />
-        <PriceChart data={data} />
+        <Player user={this.props.user} />
+        <PriceChart />
       </div>
     );
   }
@@ -157,14 +162,20 @@ class PureSetName extends Component {
     };
   }
   render(){
+    const onSubmit = () => {
+      this.props.addUser(this.state.userName);
+      this.props.setName(this.state.userName);
+    }
     return (
-      <form onSubmit={() => this.props.setName(this.state.userName)}>
+      <form onSubmit={onSubmit}>
         <label>Enter Your Name:</label>
         <input onChange={e => this.setState({userName: e.target.value})}/>
       </form>
     );
   }
 }
+
+const SetName = withAddUser(PureSetName);
 
 
 class App extends Component {
@@ -176,7 +187,7 @@ class App extends Component {
   }
   render() {
     if(!this.state.user){
-      return <PureSetName setName={name => this.setState({user: name})} />
+      return <SetName setName={name => this.setState({user: name})} />
     }
     return (
       <Provider store={store}>

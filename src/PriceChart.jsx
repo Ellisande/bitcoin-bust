@@ -2,7 +2,7 @@ import React from 'react';
 import { XYChart, LineSeries, XAxis, YAxis, LinearGradient } from '@data-ui/xy-chart';
 import _ from 'lodash';
 import withScreenSize from './withScreenSize'
-import { withData } from './withFirebase';
+import { withData, withHistory } from './withFirebase';
 
 const PriceChart = props =>{
   const data = _.isEmpty(props.data) ? [] : _.toArray(props.data);
@@ -30,4 +30,4 @@ const PriceChart = props =>{
   );
 }
 
-export default _.flow(withScreenSize, withData('exchange/history', 'data'))(PriceChart);
+export default _.flowRight(withScreenSize, withHistory('data'))(PriceChart);
