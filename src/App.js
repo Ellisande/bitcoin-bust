@@ -10,12 +10,15 @@ import PriceChart from './PriceChart';
 import { store } from './store';
 import { withData, withDataUpdate, withIncreasePrice, withDecreasePrice, withUserData, withUpdateUserData, withAddUser, withHistory } from './withFirebase';
 
+const BTC = props => <span className="btc">{numbro(props.value).format('0,0')}Ƀ</span>;
+const USD = props => <span className="usd">{numbro(props.value).format('$0,0.00')}</span>;
+
 const DisplayExchange = withData('exchange')(({exchange}) => {
   const price = exchange.price || 1;
   const totalCoins = exchange.totalCoins || 0;
   return (
     <div className="exchange">
-      <div className="">1 BTC = {numbro(price).format('$0,0.00')}</div>
+      <div className=""><BTC value={1} /> = <USD value={price}/></div>
     </div>
   );
 });
@@ -33,8 +36,8 @@ const PureBuyButton = props => {
   return (
     <div className="buy">
       <button className="trade" onClick={() => buyAction(amountToSpend)}>Buy</button>
-      <div>{numbro(amountToSpend / props.price).format('+0,0')} BTC</div>
-      <div>{numbro(amountToSpend).format('-$0,0.00')} USD</div>
+      <div><BTC value={amountToSpend / props.price} /></div>
+      <div><USD value={-amountToSpend} /></div>
     </div>
   )
 }
@@ -62,8 +65,8 @@ const PureSellButton = props => {
   return (
     <div className="sell">
       <button className="trade" onClick={() => sellAction(amountToSell)}>Sell</button>
-      <div>{numbro(amountToSell).format('-0,0')} BTC</div>
-      <div>{numbro(amountToSell * props.price).format('+$0,0.00')} USD</div>
+      <div><BTC value={-amountToSell}/></div>
+      <div><USD value={amountToSell * props.price} /></div>
     </div>
   )
 };
@@ -80,8 +83,8 @@ const SellButton = _.flow(
 const PurePlayer = props =>
   <div className="player">
     <div>{props.user}'s Wallet</div>
-    <div>BTC: {numbro(props.btc).format('0,0')}</div>
-    <div>USD: {numbro(props.usd).format('$0,0.00')}</div>
+    <div><BTC value={props.btc} /></div>
+    <div><USD value={props.usd}/></div>
   </div>;
 
 const Player = _.flow(
