@@ -113,9 +113,10 @@ class PureSetName extends Component {
     };
   }
   render(){
-    const onSubmit = () => {
-      this.props.addUser(this.state.userName);
+    const onSubmit = e => {
+      e.preventDefault();
       this.props.setName(this.state.userName);
+      this.props.addUser(this.state.userName);
     }
     return (
       <form className="enter-name" onSubmit={onSubmit}>
@@ -138,12 +139,12 @@ class App extends Component {
   constructor(props){
     super(props);
     this.state = {
-      user: undefined,
+      user: '',
     };
   }
   render() {
-    if(!this.state.user){
-      return <SetName setName={name => this.setState({user: name})} />
+    if(_.isEmpty(this.state.user)){
+      return <SetName setName={name => this.setState(oldState => ({user: name}))} />
     }
     return (
       <div className="App">
