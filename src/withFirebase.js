@@ -128,7 +128,7 @@ const withIncreasePriceHoc = WrappedComponent => {
       const velocity = Math.log10(props.buysPerSecond);
       props.updatePrice( oldPrice => oldPrice + velocity );
       props.updateBuysPerSecond( oldBuysPerSecond => oldBuysPerSecond + 1);
-      setTimeout( () => props.updateBuysPerSecond( bps => bps -1), 1000);
+      setTimeout( () => props.updateBuysPerSecond( bps => bps <= 1 ? 1 : bps - 1), 1000);
 
     }
     return (
@@ -149,7 +149,7 @@ const withDecreasePriceHoc = WrappedComponent => {
       const velocity = Math.log10(props.sellsPerSecond);
       props.updatePrice( oldPrice => oldPrice - velocity < 1 ? 1 : oldPrice - velocity );
       props.updateSellsPerSecond( sellsPerSecond => sellsPerSecond + 1);
-      setTimeout( () => props.updateSellsPerSecond( sps => sps -1), 1000);
+      setTimeout( () => props.updateSellsPerSecond( sps => sps <= 1 ? 1 : sps -1), 1000);
     }
     return (
       <WrappedComponent {... props} decreasePrice={updatePrice} />
