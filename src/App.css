@@ -82,7 +82,13 @@
 }
 
 .exchange {
-  font-size: 4rem;
+  font-size: 4em;
+}
+
+@media (max-with: 600px) {
+  .exchange {
+    font-size: 2rem;
+  }
 }
 
 .btc {
