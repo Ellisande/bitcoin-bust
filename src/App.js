@@ -1,14 +1,9 @@
 import React, { Component } from 'react';
-import { Provider, connect } from 'react-redux';
-import { createStore, combineReducers } from 'redux';
 import numbro from 'numbro';
 import _ from 'lodash';
 import './App.css';
-import { buy, sell, heatup, cooldown } from './actions';
-import { combinedReducer } from './reducers';
 import PriceChart from './PriceChart';
-import { store } from './store';
-import { withData, withDataUpdate, withIncreasePrice, withDecreasePrice, withUserData, withUpdateUserData, withAddUser, withHistory } from './withFirebase';
+import { withData, withDataUpdate, withIncreasePrice, withDecreasePrice, withUserData, withUpdateUserData, withAddUser } from './withFirebase';
 
 const BTC = props => <span className="btc">{numbro(props.value).format('0,0')}Ƀ</span>;
 const USD = props => <span className="usd">{numbro(props.value).format('$0,0.00')}</span>;
@@ -151,11 +146,9 @@ class App extends Component {
       return <SetName setName={name => this.setState({user: name})} />
     }
     return (
-      <Provider store={store}>
-        <div className="App">
-          <PlayArea user={this.state.user} />
-        </div>
-      </Provider>
+      <div className="App">
+        <PlayArea user={this.state.user} />
+      </div>
     );
   }
 }

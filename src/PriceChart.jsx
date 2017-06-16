@@ -2,7 +2,7 @@ import React from 'react';
 import { XYChart, LineSeries, XAxis, YAxis, LinearGradient } from '@data-ui/xy-chart';
 import _ from 'lodash';
 import withScreenSize from './withScreenSize'
-import { withData, withHistory } from './withFirebase';
+import { withHistory } from './withFirebase';
 
 const PriceChart = props =>{
   const data = _.isEmpty(props.data) ? [] : _.toArray(props.data);
