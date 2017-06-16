@@ -8,6 +8,23 @@
   align-items: center;
 }
 
+.intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.tiny {
+  font-size: 0.9em;
+  color: dimgrey;
+}
+
+.intro h2, .intro p {
+  margin: 0;
+}
+
 .up::after {
   color: green;
   content: '▲';
@@ -29,6 +46,10 @@
   align-items: center;
 }
 
+.action > * {
+  text-align: center;
+}
+
 @media (max-width: 600px) {
   .action {
     justify-content: space-around;
@@ -41,7 +62,6 @@
   }
   .action > * {
     margin: 10px;
-    text-align: center;
   }
 }
 
@@ -100,8 +120,8 @@ button {
 
 .play-button {
   background-color: green;
-  font-size: 5rem;
-  margin-top: 5%;
+  font-size: 2em;
+  margin-top: 30px;
 }
 
 .play-button:hover {
