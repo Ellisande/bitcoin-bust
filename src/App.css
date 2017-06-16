@@ -55,18 +55,20 @@
 .action {
   display: flex;
   flex-direction: row;
-  justify-content: center;
   align-items: center;
   max-width: 100%;
 }
 
 @media (max-width: 600px) {
-  .action > * {
-    flex: 1;
+  .action {
+    justify-content: space-around;
   }
 }
 
 @media (min-width: 601px) {
+  .action {
+    justify-content: center;
+  }
   .action > * {
     margin: 10px;
   }
