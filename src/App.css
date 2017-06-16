@@ -50,6 +50,10 @@
   text-align: center;
 }
 
+.exchange {
+  font-size: 3rem;
+}
+
 @media (max-width: 600px) {
   .action {
     justify-content: space-around;
@@ -80,16 +84,6 @@
   padding-left: 10px;
   padding-right: 10px;
   text-align: center;
-}
-
-.exchange {
-  font-size: 4em;
-}
-
-@media (max-with: 600px) {
-  .exchange {
-    font-size: 2rem;
-  }
 }
 
 .btc {
