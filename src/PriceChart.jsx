@@ -16,15 +16,15 @@ const PriceChart = props =>{
     >
       <LinearGradient
         id="my_fancy_gradient"
-        from={'blue'}
-        to={'red'}
+        from={'orange'}
+        to={'orange'}
       />
       <XAxis label="Seconds" />
       <YAxis label="Price" />
       <LineSeries
         label="BTC Price"
         data={data.map(dataPoint => ({y: dataPoint.price, x: new Date(dataPoint.time)})).splice(-100)}
-        fill="url('#my_fancy_gradient')"
+        stroke="orange"
       />
     </XYChart>
   );

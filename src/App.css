@@ -53,10 +53,12 @@
 .action {
   display: flex;
   flex-direction: row;
+  justify-content: center;
+  align-items: center;
 }
 
 .action > * {
-  flex: 1;
+  padding: 3rem;
 }
 
 .enter-name {
@@ -80,9 +82,44 @@
 }
 
 .btc {
-  color: blue;
+  color: #f7931a;
 }
 
 .usd {
   color: green;
+}
+
+button {
+  border-radius: 15px;
+  padding: 10px 30px 10px 30px;
+  border: 0px solid white;
+  transition: all 0.2s ease-in-out;
+  cursor: pointer;
+  outline: none;
+}
+
+.buy > button {
+  background: #f7931a;
+}
+
+.buy > button:hover {
+  box-shadow: 0px 0px 100px orange;
+}
+
+.sell > button {
+  background-color: green;
+}
+
+.sell > button:hover {
+  box-shadow: 0px 0px 100px green;
+}
+
+.play-button {
+  background-color: green;
+  font-size: 5rem;
+  margin-top: 5%;
+}
+
+.play-button:hover {
+  box-shadow: 0px 0px 100px green;
 }

@@ -13,15 +13,10 @@ import { withData, withDataUpdate, withIncreasePrice, withDecreasePrice, withUse
 const BTC = props => <span className="btc">{numbro(props.value).format('0,0')}Ƀ</span>;
 const USD = props => <span className="usd">{numbro(props.value).format('$0,0.00')}</span>;
 
-const DisplayExchange = withData('exchange')(({exchange}) => {
-  const price = exchange.price || 1;
-  const totalCoins = exchange.totalCoins || 0;
-  return (
-    <div className="exchange">
-      <div className=""><BTC value={1} /> = <USD value={price}/></div>
-    </div>
-  );
-});
+const DisplayExchange = props =>
+  <div className="exchange">
+    <div className=""><BTC value={1} /> = <USD value={props.price || 1}/></div>
+  </div>;
 
 const PureBuyButton = props => {
   const amountToSpend = _.min([Math.floor((props.usd * 0.5) / props.price) * props.price, 100 * props.price]);
@@ -35,7 +30,7 @@ const PureBuyButton = props => {
   };
   return (
     <div className="buy">
-      <button className="trade" onClick={() => buyAction(amountToSpend)}>Buy</button>
+      <button className="trade" onClick={() => buyAction(amountToSpend)}>Ƀuy</button>
       <div><BTC value={amountToSpend / props.price} /></div>
       <div><USD value={-amountToSpend} /></div>
     </div>
@@ -43,7 +38,6 @@ const PureBuyButton = props => {
 }
 
 const BuyButton = _.flow(
-  withData('exchange/price', 'price'),
   withUserData('usd', 'usd'),
   withUpdateUserData('btc', 'updateBtc'),
   withUpdateUserData('usd', 'updateUsd'),
@@ -64,7 +58,7 @@ const PureSellButton = props => {
   };
   return (
     <div className="sell">
-      <button className="trade" onClick={() => sellAction(amountToSell)}>Sell</button>
+      <button className="trade" onClick={() => sellAction(amountToSell)}>$ell</button>
       <div><BTC value={-amountToSell}/></div>
       <div><USD value={amountToSell * props.price} /></div>
     </div>
@@ -72,7 +66,6 @@ const PureSellButton = props => {
 };
 
 const SellButton = _.flow(
-  withData('exchange/price', 'price'),
   withUserData('btc', 'btc'),
   withUpdateUserData('usd', 'updateUsd'),
   withUpdateUserData('btc', 'updateBtc'),
@@ -93,7 +86,7 @@ const Player = _.flow(
 )(PurePlayer);
 
 
-class PlayArea extends Component {
+class PurePlayArea extends Component {
   constructor(props){
     super(props);
     this.state = {
@@ -103,22 +96,19 @@ class PlayArea extends Component {
   render() {
     return (
       <div className="screen">
-        <DisplayExchange />
+        <DisplayExchange price={this.props.price}/>
         <PriceChart />
         <Player user={this.props.user} />
         <div className="action">
-          <BuyButton user={this.props.user} />
-          <SellButton user={this.props.user} />
+          <BuyButton user={this.props.user} price={this.props.price} />
+          <SellButton user={this.props.user} price={this.props.price} />
         </div>
       </div>
     );
   }
 }
 
-const user = {
-  btc: 0,
-  usd: 2000,
-};
+const PlayArea = withData('exchange/price', 'price')(PurePlayArea);
 
 class PureSetName extends Component {
   constructor(props){
@@ -137,6 +127,7 @@ class PureSetName extends Component {
         <h2>Welcome to Ƀitcoin Ƀust!</h2>
         <label>Enter Your Name:</label>
         <input autoFocus pattern="[a-zA-Z_ ]+" onChange={e => this.setState({userName: e.target.value.replace(/ /g, '_')})}/>
+        <button className="play-button" type="submit">Play</button>
       </form>
     );
   }

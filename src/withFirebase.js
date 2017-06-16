@@ -127,7 +127,6 @@ const withIncreasePriceHoc = WrappedComponent => {
     const updatePrice = () => {
       const velocity = Math.log10(props.buysPerSecond);
       props.updatePrice( oldPrice => oldPrice + velocity );
-      props.updateHistory( props.price );
       props.updateBuysPerSecond( oldBuysPerSecond => oldBuysPerSecond + 1);
       setTimeout( () => props.updateBuysPerSecond( bps => bps -1), 1000);
 
@@ -141,7 +140,6 @@ const withIncreasePriceHoc = WrappedComponent => {
     withDataHoc('exchange/buysPerSecond', 'buysPerSecond'),
     withDataUpdateHoc('exchange/price', 'updatePrice'),
     withDataUpdateHoc('exchange/buysPerSecond', 'updateBuysPerSecond'),
-    withHistoryUpdateHoc,
   )(withIncreasePrice);
 }
 
@@ -150,7 +148,6 @@ const withDecreasePriceHoc = WrappedComponent => {
     const updatePrice = () => {
       const velocity = Math.log10(props.sellsPerSecond);
       props.updatePrice( oldPrice => oldPrice - velocity < 1 ? 1 : oldPrice - velocity );
-      props.updateHistory( props.price );
       props.updateSellsPerSecond( sellsPerSecond => sellsPerSecond + 1);
       setTimeout( () => props.updateSellsPerSecond( sps => sps -1), 1000);
     }
@@ -163,7 +160,6 @@ const withDecreasePriceHoc = WrappedComponent => {
     withDataHoc('exchange/sellsPerSecond', 'sellsPerSecond'),
     withDataUpdateHoc('exchange/price', 'updatePrice'),
     withDataUpdateHoc('exchange/sellsPerSecond', 'updateSellsPerSecond'),
-    withHistoryUpdateHoc,
   )(withDecreasePrice);
 }
 
@@ -173,12 +169,12 @@ const withHistoryHoc = propName => WrappedComponent => {
       super(props);
       this.state = {
         history: [],
-        ref: firebase.database().ref('exchange/history')
+        ref: firebase.database().ref('exchange/price')
       };
     }
     componentWillMount(){
-      this.state.ref.limitToLast(100).on('child_added', snap => {
-        this.setState( oldState => ({history: [...oldState.history, snap.val()]}));
+      this.state.ref.on('value', snap => {
+        this.setState( oldState => ({history: [...oldState.history, {price: snap.val(), time: new Date()}]}));
       })
     }
     render(){
@@ -192,26 +188,6 @@ const withHistoryHoc = propName => WrappedComponent => {
   return withHistory;
 }
 
-const withHistoryUpdateHoc = WrappedComponent => {
-  class withHistoryUpdate extends Component {
-    constructor(props){
-      super(props);
-      this.state = {
-        data: {},
-        ref: firebase.database().ref('exchange/history')
-      };
-    }
-    render(){
-      const updateHistory = price => {
-        this.state.ref.push( {price, time: firebase.database.ServerValue.TIMESTAMP })
-      }
-      const updateProps = {updateHistory};
-      return (<WrappedComponent {...this.props} {...updateProps}/>);
-    }
-  }
-  return withHistoryUpdate;
-}
-
 export {
   withDataHoc as withData,
   withUserDataHoc as withUserData,
@@ -219,7 +195,6 @@ export {
   withUpdateUserDataHoc as withUpdateUserData,
   withIncreasePriceHoc as withIncreasePrice,
   withDecreasePriceHoc as withDecreasePrice,
-  withHistoryUpdateHoc as withHistoryUpdate,
   withAddUserHoc as withAddUser,
   withHistoryHoc as withHistory,
 };
